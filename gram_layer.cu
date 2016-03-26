@@ -42,14 +42,18 @@ void GramLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 
 	int offset = 0;
 	for(int i = 0; i < batch_num_; i++) {
+		caffe_gpu_scal<Dtype>(gram_size_, (Dtype)0, gram_diff + i * gram_size_);
 		for(int j = 0; j < down_channel_; j++) {
 			caffe_copy(j + 1, top_diff + offset, gram_diff + i * gram_size_ + j * down_channel_);
+			
 			for(int k = 0; k <= j; k++) {
 				caffe_gpu_axpby<Dtype>(1, (Dtype)(1 + (k == j)), top_diff + offset + k, (Dtype)0, gram_diff + i * gram_size_ + k * down_channel_ + j);
 			}
+			
 			offset += (j + 1);
 		}
 	}
+
 	
 	Dtype* down_sample_diff = down_sampled_matrix_.mutable_gpu_diff();
 	Dtype* down_sample_data = down_sampled_matrix_.mutable_gpu_data();
@@ -58,7 +62,7 @@ void GramLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	}
 
 	Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
-	caffe_set<Dtype>(bottom[0]->count(), 0, bottom_diff);
+	caffe_gpu_scal<Dtype>(bottom[0]->count(), 0, bottom_diff);
 	for(int i = 0; i < new_num_slices_; i++) {
 		caffe_copy(slice_size_, down_sample_diff + i * slice_size_, bottom_diff + i * down_stride_ * slice_size_);
 	}
