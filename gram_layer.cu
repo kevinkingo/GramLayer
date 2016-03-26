@@ -44,7 +44,7 @@ void GramLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	for(int i = 0; i < batch_num_; i++) {
 		for(int j = 0; j < down_channel_; j++) {
 			caffe_copy(j + 1, top_diff + offset, gram_diff + i * gram_size_ + j * down_channel_);
-			for(int k = 0; k <= j; j++) {
+			for(int k = 0; k <= j; k++) {
 				caffe_gpu_axpby<Dtype>(1, (Dtype)(1 + (k == j)), top_diff + offset + k, (Dtype)0, gram_diff + i * gram_size_ + k * down_channel_ + j);
 			}
 			offset += (j + 1);
