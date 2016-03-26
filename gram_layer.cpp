@@ -25,7 +25,7 @@ void GramLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
 	batch_num_ = bottom[0]->shape(0);
 
-	LOG(INFO) << down_stride_ << " " << old_num_slices_ << " " << new_num_slices_ << " " << "\n"; 
+	//LOG(INFO) << down_stride_ << " " << old_num_slices_ << " " << new_num_slices_ << " " << slice_size_ << " " << matrix_size_ << " " << gram_size_ << " " << batch_num_ << "\n"; 
 }
 
 template <typename Dtype>
@@ -86,7 +86,7 @@ void GramLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 	for(int i = 0; i < batch_num_; i++) {
 		for(int j = 0; j < down_channel_; j++) {
 			caffe_copy(j + 1, top_diff + offset, gram_diff + i * gram_size_ + j * down_channel_);
-			for(int k = 0; k <= j; j++) {
+			for(int k = 0; k <= j; k++) {
 				caffe_cpu_axpby<Dtype>(1, (Dtype)(1 + (k == j)), top_diff + offset + k, (Dtype)0, gram_diff + i * gram_size_ + k * down_channel_ + j);
 			}
 			offset += (j + 1);
